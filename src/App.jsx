@@ -109,14 +109,14 @@ function App() {
             onClick={openFilePicker}
             className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300"
           >
-            📸 Seleccionar Imágenes
+            📸 Seleccionar
           </button>
           {previews.length > 0 && (
             <button
               onClick={handleUpload}
               className="bg-green-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300"
             >
-              📤 Enviar Imágenes
+              📤 Enviar 
             </button>
           )}
         </div>
