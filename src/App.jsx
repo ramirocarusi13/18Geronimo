@@ -87,8 +87,6 @@ function App() {
         className="bg-cover bg-center bg-no-repeat w-[80vh] h-[80vh] rounded-lg shadow-lg flex flex-col items-center justify-between py-6 relative"
         style={{ backgroundImage: "url('/fondofiesta.png')" }}
       >
-        
-
         <div className="absolute top-[45%] left-[15%] w-[70%] h-[25%] flex flex-wrap gap-2 justify-center items-center p-3 rounded-lg transition-all duration-300">
           {previews.length > 0 ? (
             previews.map((preview, index) => (
@@ -107,15 +105,22 @@ function App() {
           )}
         </div>
 
-        
-
-        <button
-          onClick={openFilePicker}
-          className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300 absolute bottom-5"
-        >
-          📸 Seleccionar Imágenes
-        </button>
-        
+        <div className="absolute bottom-5 flex gap-4">
+          <button
+            onClick={openFilePicker}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300"
+          >
+            📸 Seleccionar Imágenes
+          </button>
+          {previews.length > 0 && (
+            <button
+              onClick={handleUpload}
+              className="bg-green-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300"
+            >
+              📤 Enviar Imágenes
+            </button>
+          )}
+        </div>
 
         <input
           type="file"
@@ -126,18 +131,9 @@ function App() {
           onChange={handleFileChange}
         />
       </div>
-      {previews.length > 0 && (
-          <button
-            onClick={handleUpload}
-            className="bg-green-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300 absolute bottom-16"
-          >
-            📤 Enviar Imágenes
-          </button>
-        )}
 
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
-    
   );
 }
 
