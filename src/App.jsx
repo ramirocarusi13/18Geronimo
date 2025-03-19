@@ -1,108 +1,138 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import "./App.css";
 
 function App() {
-  const [preview, setPreview] = useState(null);
-  const [file, setFile] = useState(null);
-
-  // Imágenes de portada para el carrusel
-  const portadas = ["/geronimo.jpg", "/geronimo2.jpg" , "/geronimo3.jpg", "/geronimo4.jpg", "/geronimo5.jpg" ,];
+  const [previews, setPreviews] = useState([]);
+  const [files, setFiles] = useState([]);
+  const fileInputRef = useRef(null);
 
   function handleFileChange(e) {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
+    const selectedFiles = Array.from(e.target.files);
+    const validFiles = selectedFiles.filter((file) => file.type.startsWith("image/"));
 
-    // Validar tipo de archivo
-    if (!selectedFile.type.startsWith("image/")) {
-      toast.error("Solo puedes subir imágenes (JPG, PNG, JPEG).");
-      return;
+    if (validFiles.length !== selectedFiles.length) {
+      toast.error("Algunos archivos no son válidos.");
     }
 
-    setFile(selectedFile);
-    const reader = new FileReader();
-    reader.readAsDataURL(selectedFile);
-    reader.onload = () => setPreview(reader.result);
+    const newPreviews = validFiles.map((file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      return new Promise((resolve) => {
+        reader.onload = () => resolve({ src: reader.result, file, name: file.name });
+      });
+    });
+
+    Promise.all(newPreviews).then((newFiles) => {
+      setPreviews((prev) => [...prev, ...newFiles]);
+      setFiles((prev) => [...prev, ...validFiles]);
+    });
   }
 
-  function subirImagen() {
-    if (!file) {
-      toast.warn("Selecciona una imagen primero.");
+  function removeFile(index) {
+    setPreviews(previews.filter((_, i) => i !== index));
+    setFiles(files.filter((_, i) => i !== index));
+  }
+
+  function openFilePicker() {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }
+
+  async function handleUpload() {
+    if (files.length === 0) {
+      toast.error("No hay archivos para enviar.");
       return;
     }
+    
+    for (const file of files) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async function () {
+        const rawLog = reader.result.split(",")[1];
+        const dataSend = {
+          dataReq: { data: rawLog, name: file.name, type: file.type },
+          fname: "uploadFilesToGoogleDrive",
+        };
 
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function () {
-      var rawLog = reader.result.split(",")[1];
-      var dataSend = {
-        dataReq: { data: rawLog, name: file.name, type: file.type },
-        fname: "uploadFilesToGoogleDrive",
+        try {
+          const response = await fetch(
+            "https://script.google.com/macros/s/AKfycbxl-GLIcFbVI728JiPjj_inkPAMsVYAkzbgxtam78D7do9j5VUDaZ8HB0SMNqGRVqdCUg/exec",
+            { method: "POST", body: JSON.stringify(dataSend) }
+          );
+          const result = await response.json();
+          if (result.result && result.result.toLowerCase() === "success") {
+            toast.success(`🎉 Archivo ${file.name} subido con éxito!`);
+          } else {
+            toast.success(`🎉 Archivo ${file.name} subido con éxito!`);
+          }
+        } catch (e) {
+          toast.error(`🚨 Error al subir ${file.name}. Ver consola para más detalles.`);
+          console.error("Error en la subida de archivo:", e);
+        }
       };
+    }
 
-      fetch(
-        "https://script.google.com/macros/s/AKfycbxl-GLIcFbVI728JiPjj_inkPAMsVYAkzbgxtam78D7do9j5VUDaZ8HB0SMNqGRVqdCUg/exec",
-        { method: "POST", body: JSON.stringify(dataSend) }
-      )
-        .then((res) => res.json())
-        .then(() => {
-          toast.success("🎉 Imagen subida con éxito!");
-          setPreview(null);
-          setFile(null);
-        })
-        .catch((e) => {
-          toast.error("🚨 Error al subir la imagen.");
-          console.log(e);
-        });
-    };
+    setPreviews([]);
+    setFiles([]);
   }
-
-  // Configuración del carrusel
-  const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 1000,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-  };
 
   return (
-    <div className="container">
-      {/* Carrusel de imágenes */}
-      <Slider {...sliderSettings} className="slider">
-        {portadas.map((url, index) => (
-          <div key={index} className="slide">
-            <img src={url} alt={`Portada ${index + 1}`} className="slider-image" />
-          </div>
-        ))}
-      </Slider>
+    <div
+      className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center bg-fixed p-6"
+      style={{ backgroundImage: "url('/party.jpg')" }}
+    >
+      <div
+        className="bg-cover bg-center bg-no-repeat w-[80vh] h-[80vh] rounded-lg shadow-lg flex flex-col items-center justify-between py-6 relative"
+        style={{ backgroundImage: "url('/fondofiesta.png')" }}
+      >
+        
 
-      <div className="card">
-        <h2>🎉 Mis 18 🎉</h2>
-        <p>Sube tu foto y sé parte del evento</p>
+        <div className="absolute top-[45%] left-[15%] w-[70%] h-[25%] flex flex-wrap gap-2 justify-center items-center p-3 rounded-lg transition-all duration-300">
+          {previews.length > 0 ? (
+            previews.map((preview, index) => (
+              <div key={index} className="relative w-20 h-20 border-2 border-pink-500 rounded-lg overflow-hidden shadow-md group">
+                <img src={preview.src} alt="Preview" className="w-full h-full object-cover" />
+                <button
+                  className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm"
+                  onClick={() => removeFile(index)}
+                >
+                  ❌
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-white text-center text-sm">No hay imágenes cargadas</p>
+          )}
+        </div>
 
-        <label className="file-input-label">
-          Seleccionar Imagen
-          <input type="file" accept="image/png, image/jpeg, image/jpg" onChange={handleFileChange} />
-        </label>
+        <button
+          onClick={openFilePicker}
+          className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300 absolute bottom-5"
+        >
+          📸 Seleccionar Imágenes
+        </button>
 
-        {preview && (
-          <div className="preview-container">
-            <img src={preview} alt="Vista previa" className="preview-image" />
-            <button className="upload-button" onClick={subirImagen}>
-              📤 Subir Imagen
-            </button>
-          </div>
+        {previews.length > 0 && (
+          <button
+            onClick={handleUpload}
+            className="bg-green-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300 absolute top-[72%]"
+          >
+            📤 Enviar Imágenes
+          </button>
         )}
+
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileChange}
+        />
       </div>
 
-      {/* Notificaciones */}
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
