@@ -117,7 +117,7 @@ function App() {
         {previews.length > 0 && (
           <button
             onClick={handleUpload}
-            className="bg-green-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300 absolute top-[72%]"
+            className="bg-green-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300 absolute top-[80%]"
           >
             📤 Enviar Imágenes
           </button>
