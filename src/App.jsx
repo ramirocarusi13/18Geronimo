@@ -87,9 +87,7 @@ function App() {
         className="bg-cover bg-center bg-no-repeat w-[80vh] h-[80vh] rounded-lg shadow-lg flex flex-col items-center justify-between py-6 relative"
         style={{ backgroundImage: "url('/fondofiesta.png')" }}
       >
-        <h2 className="text-white text-2xl font-bold text-center mt-4">
-          Carga tus fotos de la fiesta 🎉
-        </h2>
+        
 
         <div className="absolute top-[45%] left-[15%] w-[70%] h-[25%] flex flex-wrap gap-2 justify-center items-center p-3 rounded-lg transition-all duration-300">
           {previews.length > 0 ? (
