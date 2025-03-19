@@ -65,7 +65,7 @@ function App() {
           if (result.result && result.result.toLowerCase() === "success") {
             toast.success(`🎉 Archivo ${file.name} subido con éxito!`);
           } else {
-            toast.success(`🎉 Archivo ${file.name} subido con éxito!`);
+            toast.error(`🚨 Error al subir ${file.name}: ${result.error || "Desconocido"}`);
           }
         } catch (e) {
           toast.error(`🚨 Error al subir ${file.name}. Ver consola para más detalles.`);
@@ -87,7 +87,9 @@ function App() {
         className="bg-cover bg-center bg-no-repeat w-[80vh] h-[80vh] rounded-lg shadow-lg flex flex-col items-center justify-between py-6 relative"
         style={{ backgroundImage: "url('/fondofiesta.png')" }}
       >
-        
+        <h2 className="text-white text-2xl font-bold text-center mt-4">
+          Carga tus fotos de la fiesta 🎉
+        </h2>
 
         <div className="absolute top-[45%] left-[15%] w-[70%] h-[25%] flex flex-wrap gap-2 justify-center items-center p-3 rounded-lg transition-all duration-300">
           {previews.length > 0 ? (
@@ -107,21 +109,15 @@ function App() {
           )}
         </div>
 
+        
+
         <button
           onClick={openFilePicker}
           className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300 absolute bottom-5"
         >
           📸 Seleccionar Imágenes
         </button>
-
-        {previews.length > 0 && (
-          <button
-            onClick={handleUpload}
-            className="bg-green-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300 absolute top-[80%]"
-          >
-            📤 Enviar Imágenes
-          </button>
-        )}
+        
 
         <input
           type="file"
@@ -132,9 +128,18 @@ function App() {
           onChange={handleFileChange}
         />
       </div>
+      {previews.length > 0 && (
+          <button
+            onClick={handleUpload}
+            className="bg-green-500 text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:scale-110 transition-transform duration-300 absolute bottom-16"
+          >
+            📤 Enviar Imágenes
+          </button>
+        )}
 
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
+    
   );
 }
 
